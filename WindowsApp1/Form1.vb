@@ -1,26 +1,35 @@
 ﻿Imports System.Threading
 
 Public Class Form1
+    Dim graphics As Graphics
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim graphics As Graphics = Me.CreateGraphics
-        Dim pen As Pen
-        pen = New Pen(Drawing.Color.DarkBlue, 5)
-        Dim rectangle As New Rectangle
-        rectangle.X = 40
-        rectangle.Y = 30
-        rectangle.Width = 200
-        rectangle.Height = 100
-        graphics.DrawEllipse(pen, rectangle)
+        'Dim graphics As Graphics = Me.CreateGraphics
+        'Dim pen As Pen
+        'Pen = New Pen(Drawing.Color.DarkBlue, 5)
+        'Dim rectangle As New Rectangle
+        'Rectangle.X = 40
+        ''Rectangle.Y = 30
+        'Rectangle.Width = 200
+        ' Rectangle.Height = 100
+        ' graphics.DrawEllipse(pen, rectangle)
+        'Me.Height = 500
+        'Me.Width = 500
+        Me.Height = 1000
+        Me.Width = 1500
+        Me.Show()
+        graphics = Me.CreateGraphics
+
     End Sub
-    Dim graphics As Graphics = Me.CreateGraphics
+    'Me.height = 500
+    'Dim graphics As Graphics = Me.CreateGraphics
     Dim robots As New ArrayList
     Dim radius As Double = 4
     Dim robot_color As Color = Drawing.Color.Red
     Dim x_dist As Double = 5
     Dim y_dist As Double = 5
     Dim seed_robot_color As Color = Drawing.Color.Green
-    Dim center_x As Double = 30
-    Dim center_y As Double = 30
+    Dim center_x As Double = 110
+    Dim center_y As Double = 110
     Dim amountOfNonSeedRobots As Integer
     Dim amountOfSeeds As Integer = 4
 
@@ -31,10 +40,10 @@ Public Class Form1
         initializeSeeds(amountOfSeeds)
     End Sub
     Private Sub initializeSeeds(amountOfSeeds As Integer)
-        initializeCircle(graphics, center_x, center_y, radius, seed_robot_color, 0)
-        initializeCircle(graphics, center_x + 1, center_y, radius, seed_robot_color, 0)
-        initializeCircle(graphics, center_x, center_y + 1, radius, seed_robot_color, 0)
-        initializeCircle(graphics, center_x + 1, center_y + 1, radius, seed_robot_color, 0)
+        initializeCircle(center_x, center_y, radius, seed_robot_color, 0, True)
+        initializeCircle(center_x + 1, center_y, radius, seed_robot_color, 0, True)
+        initializeCircle(center_x, center_y + 1, radius, seed_robot_color, 0, True)
+        initializeCircle(center_x + 1, center_y + 1, radius, seed_robot_color, 0, True)
     End Sub
     Private Sub initializeRobots(amount As Integer)
         Dim amountOfColumns As Integer = Math.Sqrt(amount)
@@ -42,11 +51,11 @@ Public Class Form1
         Dim remainder As Integer = amount Mod amountOfColumns
         For i As Integer = 1 To amountOfColumns
             For j As Integer = 1 To amountOfRows
-                initializeCircle(graphics, i, j, radius, robot_color, -1)
+                initializeCircle(i, j, radius, robot_color, -1, False)
             Next
         Next
         For k As Integer = 1 To remainder
-            initializeCircle(graphics, amountOfColumns + 1, k, radius, robot_color, -1)
+            initializeCircle(amountOfColumns + 1, k, radius, robot_color, -1, False)
         Next
         'For i As Integer = 1 To amount
         'init_circle(graphics, i, i, radius, robot_color, -1)
@@ -55,8 +64,8 @@ Public Class Form1
     End Sub
     Private Sub initializeMap()
         Dim totalAmountOfRobots As Integer
-        For i As Integer = 30 To 45
-            For j As Integer = 30 To 45
+        For i As Integer = center_x To center_x + 100
+            For j As Integer = center_y To center_y + 100
                 globalMap.Add({i, j})
                 totalAmountOfRobots += 1
             Next
@@ -64,7 +73,7 @@ Public Class Form1
         amountOfNonSeedRobots = totalAmountOfRobots - amountOfSeeds
     End Sub
 
-    Private Sub draw_circle(graphics, i, j, radius, color, gradient)
+    Private Sub draw_circle(i, j, radius, color, gradient)
         Dim rectangle As New Rectangle
         Dim brush = New SolidBrush(color)
         rectangle.X = i * x_dist
@@ -75,6 +84,7 @@ Public Class Form1
 
         While Not done
             Try
+                'graphics.FillEllipse()
                 graphics.FillEllipse(brush, rectangle)
                 done = True
             Catch ex As Exception
@@ -96,7 +106,7 @@ Public Class Form1
         Return nbOfRobots
     End Function
 
-    Private Sub undraw_circle(graphics, i, j, radius, gradient)
+    Private Sub undraw_circle(i, j, radius, gradient)
         If countRobotsAtPosition(i, j) < 2 Then
             Dim rectangle As New Rectangle
             Dim brush = New SolidBrush(BackColor)
@@ -117,9 +127,9 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub initializeCircle(graphics As Graphics, i As Double, j As Double, radius As Double, color As Color, gradient As Integer)
-        draw_circle(graphics, i, j, radius, color, gradient)
-        robots.Add({i, j, gradient})
+    Private Sub initializeCircle(i As Double, j As Double, radius As Double, color As Color, gradient As Integer, arrived As Boolean)
+        draw_circle(i, j, radius, color, gradient)
+        robots.Add({i, j, gradient, arrived})
     End Sub
 
 
@@ -186,11 +196,25 @@ Public Class Form1
         Dim x As Double = robots(i)(0)
         Dim y As Double = robots(i)(1)
         For j As Double = x To center_x - 2 Step stepSize
-            moveRobot(i, x + stepSize, y)
+            Dim done As Boolean = False
+            While Not done
+                Try
+                    moveRobot(i, x + stepSize, y)
+                    done = True
+                Catch e As Exception
+                End Try
+            End While
             x = robots(i)(0)
         Next
         For k As Double = y To center_y - 2 Step stepSize
-            moveRobot(i, x, y + stepSize)
+            Dim done As Boolean = False
+            While Not done
+                Try
+                    moveRobot(i, x, y + stepSize)
+                    done = True
+                Catch e As Exception
+                End Try
+            End While
             y = robots(i)(1)
         Next
     End Sub
@@ -205,15 +229,26 @@ Public Class Form1
         Dim prevSteps(2) As Double
         Dim stepSize As Double = 1
         Dim lastTried As Integer = 0
+        Dim tried As New ArrayList
         'steps = setRandomStep(i, stepSize, gradient)
         While Not arrivedAtFinalPosition(i, stepSize)
+            If Not closeEnough(i, robots(i)(0), robots(i)(1), robots(i)(2)) Then
+                goToSeed(i, stepSize)
+            End If
             Do
-                steps = setRandomStep(i, stepSize, gradient)
+                If canMove(robots(i)(0) + prevSteps(0), robots(i)(1) + prevSteps(1)) And closeEnough(i, robots(i)(0), robots(i)(1), robots(i)(2)) Then
+                    steps = prevSteps
+                    Exit Do
+                End If
+                steps = pickRandomStep(i, stepSize, gradient)
+
             Loop While Math.Abs(prevSteps(0)) = Math.Abs(steps(0)) And Math.Abs(prevSteps(1)) = Math.Abs(steps(1))
             prevSteps = steps
+            setSteps(i, steps)
             oldGradient = robots(i)(2)
             x = robots(i)(0)
             y = robots(i)(1)
+
             While closeEnough(i, x + steps(0), y + steps(1), oldGradient) And canMove(x + steps(0), y + steps(1))
                 ' If arrivedAtFinalPosition(i, stepSize) Then
                 'Exit While
@@ -227,13 +262,29 @@ Public Class Form1
             'undo(i, steps)
 
         End While
+        robots(i)(3) = True
         'setSteps(i, steps)
         'newGradient += 1
         'End While
     End Sub
-
+    Private Function isElementOf(list As ArrayList, el1 As Double, el2 As Double)
+        For i As Integer = 0 To list.Count - 1
+            If el1 = list(i)(0) And el2 = list(i)(1) Then
+                Return True
+            End If
+        Next
+        Return False
+    End Function
     Private Function setSteps(i As Integer, steps As Double())
-        moveRobot(i, robots(i)(0) + steps(0), robots(i)(1) + steps(1))
+        Dim done As Boolean = False
+        While Not done
+            Try
+                moveRobot(i, robots(i)(0) + steps(0), robots(i)(1) + steps(1))
+                done = True
+            Catch ex As Exception
+
+            End Try
+        End While
     End Function
 
     Private Function maximumGradient(i As Integer, stepSize As Double)
@@ -318,31 +369,27 @@ Public Class Form1
         Return totalCount
     End Function
 
-    Private Function triedEverything(i As Integer, tried As Array, x As Double, y As Double, stepSize As Double, gradient As Integer)
-        Dim amountOfOptions As Integer
-        amountOfOptions = countPossibleMoves(i, x, y, stepSize, gradient)
-        Dim amountOfNothing As Integer = 0
-        For j As Integer = 0 To tried.Length - 1
-            If tried(j) Is Nothing Then
-                amountOfNothing += 1
-            End If
-        Next
-        Return 4 - amountOfNothing = amountOfOptions
+    Private Function triedEverything(tried As ArrayList)
+
     End Function
 
     Private Sub moveRobot(i, x, y)
-        Dim newGradient As Double = getClosestRobotGradient(i)
-        Dim curr_x As Double = robots(i)(0)
-        Dim curr_y As Double = robots(i)(1)
-        Dim gradient As Integer = robots(i)(2)
-        undraw_circle(graphics, curr_x, curr_y, radius, gradient)
-        draw_circle(graphics, x, y, radius, robot_color, newGradient)
-        robots(i)(0) = x
-        robots(i)(1) = y
-        If newGradient = -1 Then
-            robots(i)(2) = -1
+        If canMove(x, y) Then
+            Dim newGradient As Double = getClosestRobotGradient(i)
+            Dim curr_x As Double = robots(i)(0)
+            Dim curr_y As Double = robots(i)(1)
+            Dim gradient As Integer = robots(i)(2)
+            undraw_circle(curr_x, curr_y, radius, gradient)
+            draw_circle(x, y, radius, robot_color, newGradient)
+            robots(i)(0) = x
+            robots(i)(1) = y
+            If newGradient = -1 Then
+                robots(i)(2) = -1
+            Else
+                robots(i)(2) = newGradient + 1
+            End If
         Else
-            robots(i)(2) = newGradient + 1
+            Throw New Exception
         End If
     End Sub
 
@@ -354,7 +401,7 @@ Public Class Form1
 
     Private Function canMove(x As Double, y As Double)
         For i As Integer = 0 To robots.Count - 1
-            If robots(i)(0) = x And robots(i)(1) = y And robots(i)(2) > -1 Then
+            If robots(i)(0) = x And robots(i)(1) = y Then
                 Return False
             End If
         Next
@@ -375,13 +422,13 @@ Public Class Form1
             'MsgBox("gradient")
             'MsgBox(robots(j)(2) = gradient - 1)
             'And robots(j)(2) >= gradient - 1
-            If i <> j And distanceBetweenPoints(x1, y1, x2, y2) < 2 Then
+            If i <> j And distanceBetweenPoints(x1, y1, x2, y2) < 2 And robots(j)(3) = True Then
                 Return True
             End If
         Next
         Return False
     End Function
-    Private Function setRandomStep(i As Integer, stepSize As Double, gradient As Integer)
+    Private Function pickRandomStep(i As Integer, stepSize As Double, gradient As Integer)
         Dim random As Integer
         Dim x_diff As Double
         Dim y_diff As Double
@@ -407,7 +454,7 @@ Public Class Form1
             new_y = robots(i)(1) + y_diff
         Loop While Not (canMove(new_x, new_y) And closeEnough(i, new_x, new_y, gradient))
 
-        moveRobot(i, new_x, new_y)
+        'moveRobot(i, new_x, new_y)
         'robots(i)(2) = getClosestRobotGradient(i) + 1
 
         Return {x_diff, y_diff}
@@ -446,7 +493,7 @@ Public Class Form1
             ' threads.Add(New Thread(Sub() Me.clickStepButton(lastMoved)))
             Dim evaluator = New Thread(Sub() Me.stepRobot(lastMovedRobot))
             evaluator.Start()
-            evaluator.Sleep(50)
+            evaluator.Sleep(500)
             lastMovedRobot += 1
             'goToSeed(i, 1)
             'edgeChase(i, 1)

@@ -78,7 +78,7 @@ Partial Class Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1099, 560)
+        Me.ClientSize = New System.Drawing.Size(3844, 1061)
         Me.Controls.Add(Me.StartSingleThread)
         Me.Controls.Add(Me.StepButton)
         Me.Controls.Add(Me.StartButton)
