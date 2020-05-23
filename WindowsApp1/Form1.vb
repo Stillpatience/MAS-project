@@ -21,17 +21,20 @@ Public Class Form1
     Dim seed_robot_color As Color = Drawing.Color.Green
     Dim center_x As Double = 30
     Dim center_y As Double = 30
+    Dim amountOfNonSeedRobots As Integer
+    Dim amountOfSeeds As Integer = 4
 
     Private Sub InitButton_Click(sender As Object, e As EventArgs) Handles InitButton.Click
-        initializeRobots(21)
-        initializeSeeds()
+        ClearButton.PerformClick()
         initializeMap()
+        initializeRobots(amountOfNonSeedRobots)
+        initializeSeeds(amountOfSeeds)
     End Sub
-    Private Sub initializeSeeds()
-        init_circle(graphics, center_x, center_y, radius, seed_robot_color, 0)
-        init_circle(graphics, center_x + 1, center_y, radius, seed_robot_color, 0)
-        init_circle(graphics, center_x, center_y + 1, radius, seed_robot_color, 0)
-        init_circle(graphics, center_x + 1, center_y + 1, radius, seed_robot_color, 0)
+    Private Sub initializeSeeds(amountOfSeeds As Integer)
+        initializeCircle(graphics, center_x, center_y, radius, seed_robot_color, 0)
+        initializeCircle(graphics, center_x + 1, center_y, radius, seed_robot_color, 0)
+        initializeCircle(graphics, center_x, center_y + 1, radius, seed_robot_color, 0)
+        initializeCircle(graphics, center_x + 1, center_y + 1, radius, seed_robot_color, 0)
     End Sub
     Private Sub initializeRobots(amount As Integer)
         Dim amountOfColumns As Integer = Math.Sqrt(amount)
@@ -39,22 +42,26 @@ Public Class Form1
         Dim remainder As Integer = amount Mod amountOfColumns
         For i As Integer = 1 To amountOfColumns
             For j As Integer = 1 To amountOfRows
-                init_circle(graphics, i, j, radius, robot_color, -1)
+                initializeCircle(graphics, i, j, radius, robot_color, -1)
             Next
         Next
         For k As Integer = 1 To remainder
-            init_circle(graphics, amountOfColumns + 1, k, radius, robot_color, -1)
+            initializeCircle(graphics, amountOfColumns + 1, k, radius, robot_color, -1)
         Next
         'For i As Integer = 1 To amount
         'init_circle(graphics, i, i, radius, robot_color, -1)
         'Next
+        robots.Reverse()
     End Sub
     Private Sub initializeMap()
-        For i As Integer = 30 To 34
-            For j As Integer = 30 To 34
+        Dim totalAmountOfRobots As Integer
+        For i As Integer = 30 To 45
+            For j As Integer = 30 To 45
                 globalMap.Add({i, j})
+                totalAmountOfRobots += 1
             Next
         Next
+        amountOfNonSeedRobots = totalAmountOfRobots - amountOfSeeds
     End Sub
 
     Private Sub draw_circle(graphics, i, j, radius, color, gradient)
@@ -103,21 +110,22 @@ Public Class Form1
                     graphics.FillEllipse(brush, rectangle)
                     done = True
 
-                Catch ex As exception
+                Catch ex As Exception
 
                 End Try
             End While
         End If
     End Sub
 
-    Private Sub init_circle(graphics As Graphics, i As Double, j As Double, radius As Double, color As Color, gradient As Integer)
+    Private Sub initializeCircle(graphics As Graphics, i As Double, j As Double, radius As Double, color As Color, gradient As Integer)
         draw_circle(graphics, i, j, radius, color, gradient)
         robots.Add({i, j, gradient})
     End Sub
 
 
-    Private Sub ClearButton_Click(sender As Object, e As EventArgs) Handles ClearButton.Click
+    Private Sub ClearButtonClick(sender As Object, e As EventArgs) Handles ClearButton.Click
         graphics.Clear(BackColor)
+        robots.Clear()
     End Sub
 
     Private Function arrived(i As Integer)
@@ -152,17 +160,39 @@ Public Class Form1
             Return smallestGradient
         End If
     End Function
-
-    Private Sub goToSeed(i As Integer, step_size As Double)
-        Dim x As Double
-        Dim y As Double
-        Dim gradient As Integer = robots(i)(2)
-        While Not nextToSeed(i)
+    Private Sub goToOrigin(i As Integer, stepSize As Double)
+        Dim x As Double = robots(i)(0)
+        Dim y As Double = robots(i)(1)
+        For j As Double = 0 To x - 1 Step stepSize
+            moveRobot(i, x - stepSize, y)
             x = robots(i)(0)
+        Next
+        For k As Double = 0 To y - 1 Step stepSize
+            moveRobot(i, x, y - stepSize)
             y = robots(i)(1)
-            gradient = robots(i)(2)
-            moveRobot(i, x + step_size, y + step_size)
-        End While
+        Next
+    End Sub
+    Private Sub goToSeed(i As Integer, stepSize As Double)
+        'goToOrigin(i, stepSize)
+        'Dim x As Double
+        'Dim y As Double
+        'Dim gradient As Integer = robots(i)(2)
+        'While Not nextToSeed(i)
+        'x = robots(i)(0)
+        'y = robots(i)(1)
+        'gradient = robots(i)(2)
+        'moveRobot(i, x + stepSize, y + stepSize)
+        'End While
+        Dim x As Double = robots(i)(0)
+        Dim y As Double = robots(i)(1)
+        For j As Double = x To center_x - 2 Step stepSize
+            moveRobot(i, x + stepSize, y)
+            x = robots(i)(0)
+        Next
+        For k As Double = y To center_y - 2 Step stepSize
+            moveRobot(i, x, y + stepSize)
+            y = robots(i)(1)
+        Next
     End Sub
 
     Private Sub edgeChase(i As Integer, step_size As Double)
@@ -390,8 +420,8 @@ Public Class Form1
         Next
         Return False
     End Function
-    Dim lastMoved As Integer = 20
-    Private Sub clickStepButton(i As Integer)
+    Dim lastMoved As Integer = 0
+    Private Sub stepRobot(i As Integer)
         'MsgBox(lastMoved)
         goToSeed(i, 1)
 
@@ -399,9 +429,8 @@ Public Class Form1
     End Sub
     Private Sub StepButton_Click(sender As Object, e As EventArgs) Handles StepButton.Click
         goToSeed(lastMoved, 1)
-
         edgeChase(lastMoved, 1)
-        lastMoved -= 1
+        lastMoved += 1
 
         'Dim t1 As Thread = New Thread(New ThreadStart(AddressOf goToSeed))
 
@@ -409,18 +438,19 @@ Public Class Form1
 
     Private Sub StartButton_Click(sender As Object, e As EventArgs) Handles StartButton.Click
         Dim threads As New ArrayList
-        Dim lastMoved As Integer = 20
-        For i As Integer = 0 To 19
+        Dim lastMovedRobot As Integer = 0
+        For i As Integer = 0 To amountOfNonSeedRobots
             'Dim t1 As Thread = New Thread(New ThreadStart(AddressOf clickStepButton))
             'threads.Add(New Thread(New ThreadStart(AddressOf clickStepButton)))
             'threads.Add(New Thread(Me.clickStepButton))
             ' threads.Add(New Thread(Sub() Me.clickStepButton(lastMoved)))
-            Dim evaluator = New Thread(Sub() Me.clickStepButton(lastMoved))
+            Dim evaluator = New Thread(Sub() Me.stepRobot(lastMovedRobot))
             evaluator.Start()
-            'evaluator.Sleep(3000)
+            evaluator.Sleep(50)
+            lastMovedRobot += 1
             'goToSeed(i, 1)
             'edgeChase(i, 1)
-            lastMoved -= 1
+            'lastMoved += 1
         Next
         'For i As Integer = 0 To threads.Count - 1
         'threads(i).Start()
@@ -430,7 +460,7 @@ Public Class Form1
     End Sub
 
     Private Sub StartSingleThread_Click(sender As Object, e As EventArgs) Handles StartSingleThread.Click
-        For i As Integer = 0 To 20
+        For i As Integer = 0 To amountOfNonSeedRobots
             goToSeed(i, 1)
             edgeChase(i, 1)
         Next
