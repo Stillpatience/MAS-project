@@ -22,21 +22,24 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.InitButton = New System.Windows.Forms.Button()
+        Me.InitSquare = New System.Windows.Forms.Button()
         Me.ClearButton = New System.Windows.Forms.Button()
         Me.StartButton = New System.Windows.Forms.Button()
         Me.StepButton = New System.Windows.Forms.Button()
         Me.StartSingleThread = New System.Windows.Forms.Button()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.InitCircle = New System.Windows.Forms.Button()
+        Me.InitQuarterCircle = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
-        'InitButton
+        'InitSquare
         '
-        Me.InitButton.Location = New System.Drawing.Point(895, 141)
-        Me.InitButton.Name = "InitButton"
-        Me.InitButton.Size = New System.Drawing.Size(75, 23)
-        Me.InitButton.TabIndex = 0
-        Me.InitButton.Text = "Initialize"
-        Me.InitButton.UseVisualStyleBackColor = True
+        Me.InitSquare.Location = New System.Drawing.Point(895, 30)
+        Me.InitSquare.Name = "InitSquare"
+        Me.InitSquare.Size = New System.Drawing.Size(115, 23)
+        Me.InitSquare.TabIndex = 0
+        Me.InitSquare.Text = "Initialize square"
+        Me.InitSquare.UseVisualStyleBackColor = True
         '
         'ClearButton
         '
@@ -49,16 +52,16 @@ Partial Class Form1
         '
         'StartButton
         '
-        Me.StartButton.Location = New System.Drawing.Point(895, 232)
+        Me.StartButton.Location = New System.Drawing.Point(895, 272)
         Me.StartButton.Name = "StartButton"
-        Me.StartButton.Size = New System.Drawing.Size(75, 23)
+        Me.StartButton.Size = New System.Drawing.Size(115, 23)
         Me.StartButton.TabIndex = 2
-        Me.StartButton.Text = "Start"
+        Me.StartButton.Text = "Start Multi thread"
         Me.StartButton.UseVisualStyleBackColor = True
         '
         'StepButton
         '
-        Me.StepButton.Location = New System.Drawing.Point(895, 276)
+        Me.StepButton.Location = New System.Drawing.Point(895, 228)
         Me.StepButton.Name = "StepButton"
         Me.StepButton.Size = New System.Drawing.Size(75, 23)
         Me.StepButton.TabIndex = 3
@@ -74,25 +77,58 @@ Partial Class Form1
         Me.StartSingleThread.Text = "Start Single thread"
         Me.StartSingleThread.UseVisualStyleBackColor = True
         '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(1865, 519)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(115, 23)
+        Me.Button1.TabIndex = 5
+        Me.Button1.Text = "Initialize square"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'InitCircle
+        '
+        Me.InitCircle.Location = New System.Drawing.Point(895, 88)
+        Me.InitCircle.Name = "InitCircle"
+        Me.InitCircle.Size = New System.Drawing.Size(115, 23)
+        Me.InitCircle.TabIndex = 6
+        Me.InitCircle.Text = "Initialize circle"
+        Me.InitCircle.UseVisualStyleBackColor = True
+        '
+        'InitQuarterCircle
+        '
+        Me.InitQuarterCircle.Location = New System.Drawing.Point(895, 59)
+        Me.InitQuarterCircle.Name = "InitQuarterCircle"
+        Me.InitQuarterCircle.Size = New System.Drawing.Size(161, 23)
+        Me.InitQuarterCircle.TabIndex = 7
+        Me.InitQuarterCircle.Text = "Initialize quarter circle"
+        Me.InitQuarterCircle.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(3844, 1061)
+        Me.Controls.Add(Me.InitQuarterCircle)
+        Me.Controls.Add(Me.InitCircle)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.StartSingleThread)
         Me.Controls.Add(Me.StepButton)
         Me.Controls.Add(Me.StartButton)
         Me.Controls.Add(Me.ClearButton)
-        Me.Controls.Add(Me.InitButton)
+        Me.Controls.Add(Me.InitSquare)
         Me.Name = "Form1"
         Me.Text = "Form1"
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents InitButton As Button
+    Friend WithEvents InitSquare As Button
     Friend WithEvents ClearButton As Button
     Friend WithEvents StartButton As Button
     Friend WithEvents StepButton As Button
     Friend WithEvents StartSingleThread As Button
+    Friend WithEvents Button1 As Button
+    Friend WithEvents InitCircle As Button
+    Friend WithEvents InitQuarterCircle As Button
 End Class
