@@ -30,6 +30,7 @@ Partial Class Form1
         Me.Button1 = New System.Windows.Forms.Button()
         Me.InitCircle = New System.Windows.Forms.Button()
         Me.InitQuarterCircle = New System.Windows.Forms.Button()
+        Me.NonConvexButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'InitSquare
@@ -104,11 +105,21 @@ Partial Class Form1
         Me.InitQuarterCircle.Text = "Initialize quarter circle"
         Me.InitQuarterCircle.UseVisualStyleBackColor = True
         '
+        'NonConvexButton
+        '
+        Me.NonConvexButton.Location = New System.Drawing.Point(895, 117)
+        Me.NonConvexButton.Name = "NonConvexButton"
+        Me.NonConvexButton.Size = New System.Drawing.Size(153, 23)
+        Me.NonConvexButton.TabIndex = 8
+        Me.NonConvexButton.Text = "Initialize non-convex"
+        Me.NonConvexButton.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(3844, 1061)
+        Me.Controls.Add(Me.NonConvexButton)
         Me.Controls.Add(Me.InitQuarterCircle)
         Me.Controls.Add(Me.InitCircle)
         Me.Controls.Add(Me.Button1)
@@ -131,4 +142,5 @@ Partial Class Form1
     Friend WithEvents Button1 As Button
     Friend WithEvents InitCircle As Button
     Friend WithEvents InitQuarterCircle As Button
+    Friend WithEvents NonConvexButton As Button
 End Class

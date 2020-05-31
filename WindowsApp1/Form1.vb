@@ -1,4 +1,6 @@
 ﻿Imports System.Threading
+Imports System.Timers
+Imports Timer = System.Timers.Timer
 
 Public Class Form1
     Dim graphics As Graphics
@@ -26,9 +28,10 @@ Public Class Form1
 
     Private Sub InitSquareButton_Click(sender As Object, e As EventArgs) Handles InitSquare.Click
         ClearButton.PerformClick()
-        initializeSquareMap(40, 40)
+        initializeSquareMap(40, 25)
         initializeRobots(amountOfNonSeedRobots)
         initializeSeeds()
+        showMap()
     End Sub
     Private Sub initializeSeeds()
         initializeCircle(centerX, centerY, robotRadius, seedRobotColor, 0, True)
@@ -65,6 +68,7 @@ Public Class Form1
         Next
         'showMap()
         amountOfNonSeedRobots = totalAmountOfRobots + 1 - amountOfSeeds
+        MsgBox(totalAmountOfRobots)
     End Sub
 
     Private Sub initializeQuarterCircleMap(width As Integer, height As Integer, radius As Double)
@@ -80,6 +84,7 @@ Public Class Form1
 
         'showMap()
         amountOfNonSeedRobots = totalAmountOfRobots - amountOfSeeds
+        MsgBox(totalAmountOfRobots)
     End Sub
 
     Private Sub showMap()
@@ -97,6 +102,7 @@ Public Class Form1
             Next
         Next
         amountOfNonSeedRobots = totalAmountOfRobots - amountOfSeeds
+        MsgBox(totalAmountOfRobots)
     End Sub
 
     Private Sub draw_circle(i, j, radius, color, gradient)
@@ -211,6 +217,7 @@ Public Class Form1
         Next
     End Sub
     Private Sub goToSeed(i As Integer, stepSize As Double)
+        robots(i)(3) = False
         Dim x As Double = robots(i)(0)
         Dim y As Double = robots(i)(1)
         For j As Double = x To centerX - 2 Step stepSize
@@ -266,10 +273,21 @@ Public Class Form1
             x = robots(i)(0)
             y = robots(i)(1)
             count += 1
-            If count > 100 Then
-                MsgBox("inner loop")
-            End If
             While closeEnough(i, x + steps(0), y + steps(1), gradient) And canMove(x + steps(0), y + steps(1))
+                Dim tries As Integer = 0
+                If count > 100 Then
+                    Do
+                        prevSteps = steps
+                        steps = pickRandomStep(i, stepSize, gradient)
+                        If canMove(x + steps(0), y + steps(1)) Then
+                            Exit Do
+                        End If
+                        tries += 1
+                        If tries > 10 Then
+                            Exit Do
+                        End If
+                    Loop While Math.Abs(prevSteps(0)) = Math.Abs(steps(0)) And Math.Abs(prevSteps(1)) = Math.Abs(steps(1))
+                End If
                 If onMap(x + steps(0), y + steps(1)) Then
                     arrivedOnMap = True
                 End If
@@ -536,8 +554,18 @@ Public Class Form1
         For i As Integer = 0 To amountOfNonSeedRobots
             Dim evaluator = New Thread(Sub() Me.stepRobot(i))
             threads.Add(evaluator)
-            evaluator.Start()
-            evaluator.Sleep(500)
+            If i < 5 Then
+                evaluator.Start()
+                evaluator.Sleep(500)
+            Else
+                While robots(i - 2)(3) = False
+                    'evaluator.Start()
+                    'evaluator.Sleep(500)
+                End While
+                evaluator.Start()
+                evaluator.Sleep(500)
+            End If
+
         Next
     End Sub
 
@@ -548,17 +576,46 @@ Public Class Form1
         Next
     End Sub
 
+
     Private Sub InitQuarterCircle_Click(sender As Object, e As EventArgs) Handles InitQuarterCircle.Click
         ClearButton.PerformClick()
         initializeQuarterCircleMap(40, 40, 40)
         initializeRobots(amountOfNonSeedRobots)
         initializeSeeds()
+        showMap()
     End Sub
 
     Private Sub InitCircle_Click(sender As Object, e As EventArgs) Handles InitCircle.Click
         ClearButton.PerformClick()
-        initializeCircleMap(5)
+        initializeCircleMap(18)
         initializeRobots(amountOfNonSeedRobots)
         initializeSeeds()
+        showMap()
+
+    End Sub
+
+
+    Private Sub NonConvexButton_Click(sender As Object, e As EventArgs) Handles NonConvexButton.Click
+        ClearButton.PerformClick()
+        initializeNonConvexMap(70, 70, 70)
+        initializeRobots(amountOfNonSeedRobots)
+        initializeSeeds()
+        showMap()
+    End Sub
+
+    Private Sub initializeNonConvexMap(width As Integer, height As Integer, radius As Double)
+        Dim totalAmountOfRobots As Integer
+        For i As Integer = centerX To centerX + width
+            For j As Integer = centerY To centerY + height
+                If distanceBetweenPoints(centerX + width, centerY + height, i, j) > radius Then
+                    globalMap.Add({i, j})
+                    totalAmountOfRobots += 1
+                End If
+            Next
+        Next
+
+        'showMap()
+        amountOfNonSeedRobots = totalAmountOfRobots - amountOfSeeds
+        MsgBox(totalAmountOfRobots)
     End Sub
 End Class
